@@ -431,6 +431,10 @@
   }
 
   function appendMessage(msg) {
+    if (!msg || !msg.id) return;
+    // Ngăn chặn lặp lại tin nhắn
+    if (document.getElementById(`msg-${msg.id}`)) return;
+
     const isOut = msg.senderId === currentUser.id;
     const timeStr = formatTime(msg.createdAt);
 
@@ -510,11 +514,47 @@
   btnSendMessage.addEventListener('click', handleSendMessage);
 
   chatTextInput.addEventListener('keydown', (e) => {
+    // Ngăn chặn gõ tiếng Việt bị nhảy từ hoặc lặp chữ (Bộ gõ Telex/VNI)
+    if (e.isComposing || e.keyCode === 229) {
+      return;
+    }
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
       handleSendMessage();
     } else {
       emitTyping(true);
+    }
+  });
+
+  // Hỗ trợ Dán ảnh trực tiếp từ Clipboard (Ctrl+V / Cmd+V hoặc chụp màn hình dán vào)
+  window.addEventListener('paste', async (e) => {
+    const clipboardData = e.clipboardData || window.clipboardData;
+    if (!clipboardData) return;
+    const items = clipboardData.items;
+    if (!items) return;
+
+    for (let i = 0; i < items.length; i++) {
+      const item = items[i];
+      if (item.type && item.type.indexOf('image') !== -1) {
+        e.preventDefault();
+        const file = item.getAsFile();
+        if (file) {
+          const timestamp = Date.now();
+          const safeFile = new File([file], `anh_dan_${timestamp}.png`, { type: file.type || 'image/png' });
+          await uploadAndSendFile(safeFile);
+        }
+      }
+    }
+  });
+
+  // Hỗ trợ Kéo & Thả (Drag & Drop) ảnh/file trực tiếp vào cửa sổ chat
+  window.addEventListener('dragover', (e) => e.preventDefault());
+  window.addEventListener('drop', async (e) => {
+    e.preventDefault();
+    if (e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+      for (let i = 0; i < e.dataTransfer.files.length; i++) {
+        await uploadAndSendFile(e.dataTransfer.files[i]);
+      }
     }
   });
 
