@@ -546,25 +546,43 @@
   });
 
   // Hỗ trợ Dán ảnh trực tiếp từ Clipboard (Ctrl+V / Cmd+V hoặc chụp màn hình dán vào)
-  window.addEventListener('paste', async (e) => {
+  async function handlePaste(e) {
     const clipboardData = e.clipboardData || window.clipboardData;
     if (!clipboardData) return;
-    const items = clipboardData.items;
-    if (!items) return;
 
-    for (let i = 0; i < items.length; i++) {
-      const item = items[i];
-      if (item.type && item.type.indexOf('image') !== -1) {
-        e.preventDefault();
-        const file = item.getAsFile();
-        if (file) {
-          const timestamp = Date.now();
-          const safeFile = new File([file], `anh_dan_${timestamp}.png`, { type: file.type || 'image/png' });
-          await uploadAndSendFile(safeFile);
+    // 1. Kiểm tra files (copy ảnh từ Finder/Explorer/Screenshot)
+    if (clipboardData.files && clipboardData.files.length > 0) {
+      for (let i = 0; i < clipboardData.files.length; i++) {
+        const file = clipboardData.files[i];
+        if (file.type && file.type.startsWith('image/')) {
+          e.preventDefault();
+          await uploadAndSendFile(file);
+          return;
         }
       }
     }
-  });
+
+    // 2. Kiểm tra items (ảnh copy từ trình duyệt hoặc bộ nhớ tạm)
+    const items = clipboardData.items;
+    if (items) {
+      for (let i = 0; i < items.length; i++) {
+        const item = items[i];
+        if (item.type && item.type.indexOf('image') !== -1) {
+          e.preventDefault();
+          const file = item.getAsFile();
+          if (file) {
+            const timestamp = Date.now();
+            const safeFile = new File([file], `anh_dan_${timestamp}.png`, { type: file.type || 'image/png' });
+            await uploadAndSendFile(safeFile);
+            return;
+          }
+        }
+      }
+    }
+  }
+
+  window.addEventListener('paste', handlePaste);
+  chatTextInput.addEventListener('paste', handlePaste);
 
   // Hỗ trợ Kéo & Thả (Drag & Drop) ảnh/file trực tiếp vào cửa sổ chat
   window.addEventListener('dragover', (e) => e.preventDefault());
