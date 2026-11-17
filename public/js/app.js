@@ -51,6 +51,21 @@
   const btnBackSidebar = document.getElementById('btn-back-sidebar');
   const chatItemGeneral = document.getElementById('chat-item-general');
   const inputSearchChats = document.getElementById('input-search-chats');
+  const btnOpenMedia = document.getElementById('btn-open-media');
+  const chatHeaderClickable = document.getElementById('chat-header-clickable');
+
+  // DOM Elements - Shared Media Modal
+  const modalMedia = document.getElementById('modal-media');
+  const btnCloseMedia = document.getElementById('btn-close-media');
+  const mediaModalTitle = document.getElementById('media-modal-title');
+  const galleryImagesGrid = document.getElementById('gallery-images-grid');
+  const listMediaFiles = document.getElementById('list-media-files');
+  const countMediaImages = document.getElementById('count-media-images');
+  const countMediaFiles = document.getElementById('count-media-files');
+  const emptyMediaImages = document.getElementById('empty-media-images');
+  const emptyMediaFiles = document.getElementById('empty-media-files');
+  const tabMediaImages = document.getElementById('tab-media-images');
+  const tabMediaFiles = document.getElementById('tab-media-files');
 
   // DOM Elements - Admin Modal
   const modalAdmin = document.getElementById('modal-admin');
@@ -956,6 +971,115 @@
         statInvites.textContent = data.stats.totalInvites;
       }
     } catch (e) {}
+  }
+
+  // ==================== SHARED MEDIA GALLERY LOGIC ====================
+  function openSharedMediaModal() {
+    if (mediaModalTitle) mediaModalTitle.textContent = `📁 Kho Media: ${activeChat.title}`;
+    if (modalMedia) modalMedia.style.display = 'flex';
+    loadSharedMedia();
+  }
+
+  if (btnOpenMedia) {
+    btnOpenMedia.addEventListener('click', openSharedMediaModal);
+  }
+  if (chatHeaderClickable) {
+    chatHeaderClickable.addEventListener('click', (e) => {
+      if (e.target && e.target.id === 'btn-back-sidebar') return;
+      openSharedMediaModal();
+    });
+  }
+
+  if (btnCloseMedia) {
+    btnCloseMedia.addEventListener('click', () => {
+      modalMedia.style.display = 'none';
+    });
+  }
+  if (modalMedia) {
+    modalMedia.addEventListener('click', (e) => {
+      if (e.target === modalMedia) {
+        modalMedia.style.display = 'none';
+      }
+    });
+  }
+
+  // Media tabs switching
+  document.querySelectorAll('[data-mediatab]').forEach(tab => {
+    tab.addEventListener('click', () => {
+      document.querySelectorAll('[data-mediatab]').forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+      const target = tab.getAttribute('data-mediatab');
+      if (tabMediaImages) tabMediaImages.style.display = target === 'tab-media-images' ? 'block' : 'none';
+      if (tabMediaFiles) tabMediaFiles.style.display = target === 'tab-media-files' ? 'block' : 'none';
+    });
+  });
+
+  async function loadSharedMedia() {
+    if (!galleryImagesGrid || !listMediaFiles) return;
+    galleryImagesGrid.innerHTML = '';
+    listMediaFiles.innerHTML = '';
+    if (countMediaImages) countMediaImages.textContent = '...';
+    if (countMediaFiles) countMediaFiles.textContent = '...';
+    if (emptyMediaImages) emptyMediaImages.style.display = 'none';
+    if (emptyMediaFiles) emptyMediaFiles.style.display = 'none';
+
+    try {
+      const res = await fetch(`/api/media/${activeChat.type}/${activeChat.id}`, {
+        headers: { Authorization: `Bearer ${authToken}` }
+      });
+      const data = await res.json();
+      if (!data.success) return;
+
+      const { images, files } = data.media;
+
+      if (countMediaImages) countMediaImages.textContent = images.length;
+      if (countMediaFiles) countMediaFiles.textContent = files.length;
+
+      // Render images grid
+      if (images.length === 0) {
+        if (emptyMediaImages) emptyMediaImages.style.display = 'block';
+      } else {
+        images.forEach(img => {
+          const card = document.createElement('div');
+          card.className = 'gallery-card';
+          card.innerHTML = `
+            <img src="${img.url}" alt="${escapeHTML(img.filename)}" loading="lazy">
+            <div class="gallery-card-info">
+              <span>${escapeHTML(img.senderName)}</span>
+              <span>${formatTime(img.createdAt)}</span>
+            </div>
+          `;
+          card.addEventListener('click', () => {
+            window.viewImage(img.url);
+          });
+          galleryImagesGrid.appendChild(card);
+        });
+      }
+
+      // Render files list
+      if (files.length === 0) {
+        if (emptyMediaFiles) emptyMediaFiles.style.display = 'block';
+      } else {
+        files.forEach(f => {
+          const fileCard = document.createElement('a');
+          fileCard.href = f.url;
+          fileCard.download = f.filename;
+          fileCard.target = '_blank';
+          fileCard.className = 'attachment-file';
+          fileCard.innerHTML = `
+            <span class="file-icon">📄</span>
+            <div class="file-info">
+              <div class="file-name">${escapeHTML(f.filename)}</div>
+              <div class="file-size">${formatFileSize(f.size)} • Gửi bởi ${escapeHTML(f.senderName)} (${formatTime(f.createdAt)})</div>
+            </div>
+            <span class="file-download-icon" title="Tải xuống">⬇️</span>
+          `;
+          listMediaFiles.appendChild(fileCard);
+        });
+      }
+    } catch (err) {
+      console.error('Error loading media gallery:', err);
+    }
   }
 
   // ==================== UTILITIES ====================

@@ -138,13 +138,18 @@
     <!-- MAIN CHAT PANE -->
     <main class="chat-main">
       <header class="chat-header">
-        <div class="chat-header-info">
+        <div class="chat-header-info" id="chat-header-clickable" style="cursor: pointer;" title="Bấm để xem kho ảnh và tệp tin">
           <button id="btn-back-sidebar" class="btn-back" title="Danh sách chat">←</button>
           <div id="active-chat-avatar" class="chat-item-avatar" style="background-color: #2b5278;">🚀</div>
           <div class="chat-header-details">
             <h3 id="active-chat-title">Hội Anh Em 🚀</h3>
             <span id="active-chat-status" class="status-text">Đang kết nối...</span>
           </div>
+        </div>
+        <div class="chat-header-actions">
+          <button id="btn-open-media" class="icon-btn" title="Xem lại tất cả ảnh và file đã gửi" style="font-size: 13.5px; display: flex; align-items: center; gap: 6px; background: rgba(82, 136, 193, 0.15); color: var(--accent-hover); padding: 6px 14px; border-radius: 20px; font-weight: 600;">
+            📁 Kho Media
+          </button>
         </div>
       </header>
 
@@ -251,6 +256,45 @@
           <p style="font-size: 13px; color: var(--text-secondary); line-height: 1.6; text-align: center;">
             Hệ thống đang hoạt động với bảo mật khép kín. Người ngoài không thể truy cập nếu không có Link Mời từ bạn.
           </p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== SHARED MEDIA MODAL (KHO ẢNH & FILE) ==================== -->
+  <div id="modal-media" class="modal-overlay" style="display: none;">
+    <div class="modal-content" style="max-width: 680px; height: 80vh;">
+      <div class="modal-header">
+        <h3 id="media-modal-title">📁 Kho Tệp Tin & Hình Ảnh</h3>
+        <button id="btn-close-media" class="icon-btn" style="font-size: 20px;">✕</button>
+      </div>
+
+      <div class="modal-tabs">
+        <button class="modal-tab active" data-mediatab="tab-media-images">🖼️ Hình Ảnh (<span id="count-media-images">0</span>)</button>
+        <button class="modal-tab" data-mediatab="tab-media-files">📄 Tệp Tin & Tài Liệu (<span id="count-media-files">0</span>)</button>
+      </div>
+
+      <div class="modal-body" style="padding: 18px;">
+        <!-- TAB IMAGES -->
+        <div id="tab-media-images">
+          <div id="gallery-images-grid" class="media-gallery-grid">
+            <!-- Dynamic image grid -->
+          </div>
+          <div id="empty-media-images" style="display: none; text-align: center; color: var(--text-secondary); padding: 50px 20px;">
+            <div style="font-size: 40px; margin-bottom: 10px;">📷</div>
+            Chưa có hình ảnh nào được gửi trong cuộc trò chuyện này
+          </div>
+        </div>
+
+        <!-- TAB FILES -->
+        <div id="tab-media-files" style="display: none;">
+          <div id="list-media-files" class="media-files-list">
+            <!-- Dynamic file list -->
+          </div>
+          <div id="empty-media-files" style="display: none; text-align: center; color: var(--text-secondary); padding: 50px 20px;">
+            <div style="font-size: 40px; margin-bottom: 10px;">📁</div>
+            Chưa có tệp tin hay tài liệu nào được gửi trong cuộc trò chuyện này
+          </div>
         </div>
       </div>
     </div>

@@ -262,7 +262,48 @@ app.get('/api/messages/direct/:targetUserId', authMiddleware, (req, res) => {
   res.json({ success: true, messages, targetUser: { id: targetUser.id, displayName: targetUser.displayName, avatar: targetUser.avatar, avatarColor: targetUser.avatarColor } });
 });
 
-// List all active members for chat directory
+// Get media (images and files) for a room or direct conversation
+app.get('/api/media/:type/:id', authMiddleware, (req, res) => {
+  const { type, id } = req.params;
+  let messages = [];
+  if (type === 'room') {
+    messages = db.data.messages.filter(m => m.roomId === id && !m.directTo && !!m.attachment);
+  } else if (type === 'direct') {
+    messages = db.data.messages.filter(m => {
+      return (
+        ((m.senderId === req.user.id && m.directTo === id) ||
+         (m.senderId === id && m.directTo === req.user.id)) &&
+        !!m.attachment
+      );
+    });
+  }
+
+  const images = messages
+    .filter(m => m.attachment && m.attachment.type === 'image')
+    .map(m => ({
+      id: m.id,
+      url: m.attachment.url,
+      filename: m.attachment.filename,
+      senderName: m.senderName,
+      createdAt: m.createdAt
+    }))
+    .reverse();
+
+  const files = messages
+    .filter(m => m.attachment && m.attachment.type !== 'image')
+    .map(m => ({
+      id: m.id,
+      url: m.attachment.url,
+      filename: m.attachment.filename,
+      size: m.attachment.size,
+      type: m.attachment.type,
+      senderName: m.senderName,
+      createdAt: m.createdAt
+    }))
+    .reverse();
+
+  res.json({ success: true, media: { images, files } });
+});
 app.get('/api/users/list', authMiddleware, (req, res) => {
   const users = db.getAllUsers(true)
     .filter(u => u.status === 'active' && u.id !== req.user.id);
