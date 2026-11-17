@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="robots" content="noindex, nofollow">
+  <title>AECHAT - Không Gian Trò Chuyện Riêng Tư</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>✈️</text></svg>">
+</head>
+<body>
+
+  <!-- ==================== VIEW 1: GATEKEEPER / LOCK SCREEN ==================== -->
+  <div id="view-gatekeeper" class="auth-wrapper" style="display: none;">
+    <div class="auth-card">
+      <div class="logo-icon">🔒</div>
+      <h2>AECHAT</h2>
+      <p class="subtitle">Không gian trò chuyện riêng tư của Hội Anh Em.<br>Trang web này không mở công khai. Bạn cần có <b>Liên kết mời (Invite Link)</b> từ Admin để tham gia.</p>
+
+      <div class="form-group">
+        <label>Đã có mã mời bí mật?</label>
+        <input type="text" id="input-gatekeeper-key" class="form-input" placeholder="Ví dụ: ANHEM2026" style="text-transform: uppercase;">
+      </div>
+      <button id="btn-unlock-invite" class="btn-primary">Mở Khóa Đăng Ký</button>
+
+      <div style="margin: 20px 0 10px; border-top: 1px solid var(--border-color); padding-top: 16px;">
+        <p style="font-size: 13px; color: var(--text-secondary); margin-bottom: 10px;">Đã có tài khoản thành viên?</p>
+        <button id="btn-go-login" class="btn-secondary">Đăng Nhập Ngay</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== VIEW 2: REGISTER WITH INVITE ==================== -->
+  <div id="view-register" class="auth-wrapper" style="display: none;">
+    <div class="auth-card">
+      <div class="logo-icon">✈️</div>
+      <h2>Tham Gia AECHAT</h2>
+      <div id="register-badge" class="badge-invite">🔑 Lời mời hợp lệ: <span id="span-invite-key"></span></div>
+
+      <form id="form-register">
+        <div class="form-group">
+          <label>Tên đăng nhập (Username):</label>
+          <input type="text" id="reg-username" class="form-input" placeholder="viet_anh, tuan_pro..." required autocomplete="off">
+        </div>
+
+        <div class="form-group">
+          <label>Tên hiển thị trong phòng chat:</label>
+          <input type="text" id="reg-displayname" class="form-input" placeholder="Ví dụ: Hoàng Tuấn AE" required autocomplete="off">
+        </div>
+
+        <div class="form-group">
+          <label>Mật khẩu:</label>
+          <input type="password" id="reg-password" class="form-input" placeholder="Tối thiểu 6 ký tự" required>
+        </div>
+
+        <div class="form-group">
+          <label>Chọn biểu tượng đại diện (Avatar):</label>
+          <div class="avatar-selector">
+            <div class="avatar-opt selected" data-avatar="😎">😎</div>
+            <div class="avatar-opt" data-avatar="🔥">🔥</div>
+            <div class="avatar-opt" data-avatar="🚀">🚀</div>
+            <div class="avatar-opt" data-avatar="⚡">⚡</div>
+            <div class="avatar-opt" data-avatar="👑">👑</div>
+            <div class="avatar-opt" data-avatar="🦁">🦁</div>
+          </div>
+        </div>
+
+        <button type="submit" class="btn-primary">Tạo Tài Khoản & Vào Chat 🚀</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ==================== VIEW 3: LOGIN SCREEN ==================== -->
+  <div id="view-login" class="auth-wrapper" style="display: none;">
+    <div class="auth-card">
+      <div class="logo-icon">🔑</div>
+      <h2>Đăng Nhập AECHAT</h2>
+      <p class="subtitle">Nhập tài khoản của bạn để vào không gian trò chuyện.</p>
+
+      <form id="form-login">
+        <div class="form-group">
+          <label>Tên đăng nhập:</label>
+          <input type="text" id="login-username" class="form-input" placeholder="Username của bạn" required>
+        </div>
+
+        <div class="form-group">
+          <label>Mật khẩu:</label>
+          <input type="password" id="login-password" class="form-input" placeholder="Mật khẩu" required>
+        </div>
+
+        <button type="submit" class="btn-primary">Đăng Nhập</button>
+        <button type="button" id="btn-login-back" class="btn-secondary">Quay lại</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ==================== VIEW 4: MAIN TELEGRAM CHAT APP ==================== -->
+  <div id="app-layout" style="display: none;">
+    
+    <!-- SIDEBAR -->
+    <aside id="sidebar" class="sidebar">
+      <div class="sidebar-header">
+        <div class="brand">
+          <div class="brand-icon">✈️</div>
+          <div class="brand-title">AECHAT</div>
+        </div>
+        <div class="user-controls">
+          <button id="btn-open-admin" class="icon-btn" title="Quản trị phòng (Admin)" style="display: none;">👑</button>
+          <div id="my-avatar" class="chat-item-avatar" style="width: 32px; height: 32px; font-size: 16px; cursor: pointer;" title="Tài khoản của bạn">👤</div>
+          <button id="btn-logout" class="icon-btn" title="Đăng xuất">🚪</button>
+        </div>
+      </div>
+
+      <div class="search-box">
+        <input type="text" id="input-search-chats" class="search-input" placeholder="Tìm kiếm cuộc trò chuyện...">
+      </div>
+
+      <div class="chat-list">
+        <div class="chat-list-section-title">Nhóm Chung</div>
+        <div id="chat-item-general" class="chat-item active" data-type="room" data-id="general">
+          <div class="chat-item-avatar" style="background-color: #2b5278;">🚀</div>
+          <div class="chat-item-info">
+            <div class="chat-item-header">
+              <span class="chat-item-name">Hội Anh Em 🚀</span>
+              <span id="general-time" class="chat-item-time"></span>
+            </div>
+            <div id="general-preview" class="chat-item-preview">Phòng trò chuyện chung cho cả nhóm</div>
+          </div>
+        </div>
+
+        <div class="chat-list-section-title">Thành Viên Trực Tuyến & Nhắn Tin Riêng</div>
+        <div id="direct-users-list">
+          <!-- Dynamic direct chat contacts populated via JS -->
+        </div>
+      </div>
+    </aside>
+
+    <!-- MAIN CHAT PANE -->
+    <main class="chat-main">
+      <header class="chat-header">
+        <div class="chat-header-info">
+          <button id="btn-back-sidebar" class="btn-back" title="Danh sách chat">←</button>
+          <div id="active-chat-avatar" class="chat-item-avatar" style="background-color: #2b5278;">🚀</div>
+          <div class="chat-header-details">
+            <h3 id="active-chat-title">Hội Anh Em 🚀</h3>
+            <span id="active-chat-status" class="status-text">Đang kết nối...</span>
+          </div>
+        </div>
+      </header>
+
+      <!-- MESSAGES THREAD -->
+      <div id="messages-container" class="messages-container">
+        <!-- Messages rendered dynamically -->
+      </div>
+
+      <!-- TYPING INDICATOR -->
+      <div id="typing-indicator" class="typing-bar"></div>
+
+      <!-- CHAT INPUT -->
+      <div class="chat-input-wrapper">
+        <input type="file" id="file-input" style="display: none;" multiple>
+        <button id="btn-attach" class="btn-attach" title="Đính kèm ảnh hoặc tài liệu">📎</button>
+        <textarea id="chat-text-input" class="chat-input" placeholder="Viết tin nhắn... (Enter để gửi, Shift+Enter xuống dòng)" rows="1"></textarea>
+        <button id="btn-send-message" class="btn-send" title="Gửi tin nhắn">✈️</button>
+      </div>
+    </main>
+
+  </div>
+
+  <!-- ==================== ADMIN MODAL ==================== -->
+  <div id="modal-admin" class="modal-overlay" style="display: none;">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>👑 Bảng Quản Trị AECHAT</h3>
+        <button id="btn-close-admin" class="icon-btn" style="font-size: 20px;">✕</button>
+      </div>
+
+      <div class="modal-tabs">
+        <button class="modal-tab active" data-tab="tab-invites">🔑 Quản Lý Link Mời</button>
+        <button class="modal-tab" data-tab="tab-members">👥 Thành Viên</button>
+        <button class="modal-tab" data-tab="tab-stats">📊 Thống Kê</button>
+      </div>
+
+      <div class="modal-body">
+        <!-- TAB 1: INVITES -->
+        <div id="tab-invites">
+          <div style="background-color: var(--card-bg); padding: 16px; border-radius: 12px; margin-bottom: 20px;">
+            <h4 style="font-size: 14px; margin-bottom: 12px; color: #fff;">Tạo Link Mời Mới:</h4>
+            <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+              <input type="text" id="admin-invite-key" class="form-input" placeholder="Mã mời (bỏ trống để tự tạo)" style="flex: 2; text-transform: uppercase;">
+              <input type="number" id="admin-invite-max" class="form-input" placeholder="Số lượt dùng (VD: 1, 5, 999)" value="1" style="flex: 1;">
+            </div>
+            <input type="text" id="admin-invite-label" class="form-input" placeholder="Ghi chú (Ví dụ: Cho bạn Tuấn, Hội đá bóng...)" style="margin-bottom: 10px;">
+            <button id="btn-create-invite" class="btn-primary" style="padding: 10px;">Tạo Link Mời Bí Mật 🚀</button>
+          </div>
+
+          <h4 style="font-size: 14px; margin-bottom: 10px; color: var(--text-secondary);">Danh Sách Link Mời Hiện Có:</h4>
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Mã Mời</th>
+                <th>Ghi chú</th>
+                <th>Lượt Dùng</th>
+                <th>Thao tác</th>
+              </tr>
+            </thead>
+            <tbody id="table-invites-body">
+              <!-- Populated via JS -->
+            </tbody>
+          </table>
+        </div>
+
+        <!-- TAB 2: MEMBERS -->
+        <div id="tab-members" style="display: none;">
+          <h4 style="font-size: 14px; margin-bottom: 12px; color: var(--text-secondary);">Danh Sách Thành Viên AECHAT:</h4>
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Người dùng</th>
+                <th>Vai trò</th>
+                <th>Trạng thái</th>
+                <th>Thao tác</th>
+              </tr>
+            </thead>
+            <tbody id="table-members-body">
+              <!-- Populated via JS -->
+            </tbody>
+          </table>
+        </div>
+
+        <!-- TAB 3: STATS -->
+        <div id="tab-stats" style="display: none;">
+          <div class="stats-grid">
+            <div class="stat-box">
+              <div id="stat-users" class="number">0</div>
+              <div class="label">Tổng Thành Viên</div>
+            </div>
+            <div class="stat-box">
+              <div id="stat-messages" class="number">0</div>
+              <div class="label">Tổng Tin Nhắn</div>
+            </div>
+            <div class="stat-box">
+              <div id="stat-files" class="number">0</div>
+              <div class="label">Tệp Tin & Hình Ảnh</div>
+            </div>
+            <div class="stat-box">
+              <div id="stat-invites" class="number">0</div>
+              <div class="label">Mã Mời Đã Tạo</div>
+            </div>
+          </div>
+          <p style="font-size: 13px; color: var(--text-secondary); line-height: 1.6; text-align: center;">
+            Hệ thống đang hoạt động với bảo mật khép kín. Người ngoài không thể truy cập nếu không có Link Mời từ bạn.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== LIGHTBOX MODAL ==================== -->
+  <div id="modal-lightbox" class="lightbox-modal" style="display: none;">
+    <button id="btn-close-lightbox" class="lightbox-close">✕</button>
+    <img id="lightbox-img" class="lightbox-image" src="" alt="Hình ảnh phóng to">
+  </div>
+
+  <!-- Scripts -->
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="/js/app.js"></script>
+</body>
+</html>

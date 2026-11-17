@@ -1,0 +1,51 @@
+{
+  "users": [
+    {
+      "id": "usr_admin",
+      "username": "admin",
+      "displayName": "Chủ Phòng (Admin)",
+      "password": "$2b$10$9KxAKGsSegQ6kSlhKmPvV.5VMs.bk1A6x//OompqBhHClGVP0Vejy",
+      "role": "admin",
+      "avatar": "👑",
+      "avatarColor": "#2b5278",
+      "status": "active",
+      "createdAt": "2026-11-17T04:40:47.136Z"
+    },
+    {
+      "id": "usr_1794890480538_2zitp",
+      "username": "tuan_ae",
+      "displayName": "Tuấn AE",
+      "password": "$2b$10$.v7Lu/Ra3FPABsMrmFnjrOzU1T0jFsi55ZjnMd0e0fteca/rjPUt2",
+      "role": "member",
+      "avatar": "🔥",
+      "avatarColor": "#2b5278",
+      "status": "active",
+      "createdAt": "2026-11-17T04:41:20.538Z"
+    }
+  ],
+  "invites": [
+    {
+      "id": "inv_vip_init",
+      "key": "ANHEM2026",
+      "label": "Mã Mời Khởi Tạo Hội Anh Em",
+      "maxUses": 999,
+      "usedCount": 1,
+      "createdBy": "admin",
+      "createdAt": "2026-11-17T04:40:47.140Z"
+    }
+  ],
+  "messages": [],
+  "rooms": [
+    {
+      "id": "general",
+      "name": "Hội Anh Em 🚀",
+      "description": "Phòng chat chung cho tất cả thành viên AECHAT",
+      "isGroup": true,
+      "createdAt": "2026-11-17T04:40:47.044Z"
+    }
+  ],
+  "settings": {
+    "appName": "AECHAT",
+    "allowDirectMessages": true
+  }
+}
