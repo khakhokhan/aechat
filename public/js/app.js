@@ -54,6 +54,14 @@
   const btnOpenMedia = document.getElementById('btn-open-media');
   const chatHeaderClickable = document.getElementById('chat-header-clickable');
 
+  // DOM Elements - Profile Modal (Đổi tên & Bí danh)
+  const btnEditProfile = document.getElementById('btn-edit-profile');
+  const modalProfile = document.getElementById('modal-profile');
+  const btnCloseProfile = document.getElementById('btn-close-profile');
+  const inputNewDisplayname = document.getElementById('input-new-displayname');
+  const btnSaveProfile = document.getElementById('btn-save-profile');
+  let profileSelectedAvatar = '😎';
+
   // DOM Elements - Shared Media Modal
   const modalMedia = document.getElementById('modal-media');
   const btnCloseMedia = document.getElementById('btn-close-media');
@@ -262,6 +270,22 @@
       onlineUsers = new Set(activeIds);
       renderDirectoryUsers();
       updateHeaderStatus();
+    });
+
+    socket.on('user:profile_updated', ({ userId, displayName, avatar }) => {
+      loadDirectoryUsers();
+      if (currentUser && currentUser.id === userId) {
+        currentUser.displayName = displayName;
+        if (avatar) currentUser.avatar = avatar;
+        if (myAvatar) {
+          myAvatar.textContent = avatar || '👤';
+          myAvatar.title = `${displayName} (@${currentUser.username}) - Bấm để đổi tên`;
+        }
+      }
+      if (activeChat.type === 'direct' && activeChat.id === userId) {
+        activeChatTitle.textContent = displayName;
+        if (avatar) activeChatAvatar.textContent = avatar;
+      }
     });
 
     socket.on('chat:message', (msg) => {
@@ -902,6 +926,119 @@
         statInvites.textContent = data.stats.totalInvites;
       }
     } catch (e) {}
+  }
+
+  // ==================== PROFILE MODAL LOGIC (ĐỔI TÊN & NICKNAME) ====================
+  function openProfileModal() {
+    if (!currentUser) return;
+    if (inputNewDisplayname) {
+      inputNewDisplayname.value = currentUser.displayName || '';
+    }
+    profileSelectedAvatar = currentUser.avatar || '😎';
+    const avatarOpts = document.querySelectorAll('#profile-avatar-selector .avatar-opt');
+    avatarOpts.forEach(opt => {
+      if (opt.getAttribute('data-avatar') === profileSelectedAvatar) {
+        opt.classList.add('selected');
+      } else {
+        opt.classList.remove('selected');
+      }
+    });
+    if (modalProfile) modalProfile.style.display = 'flex';
+    if (inputNewDisplayname) {
+      setTimeout(() => inputNewDisplayname.focus(), 50);
+    }
+  }
+
+  if (btnEditProfile) {
+    btnEditProfile.addEventListener('click', openProfileModal);
+  }
+  if (myAvatar) {
+    myAvatar.addEventListener('click', openProfileModal);
+  }
+
+  if (btnCloseProfile) {
+    btnCloseProfile.addEventListener('click', () => {
+      if (modalProfile) modalProfile.style.display = 'none';
+    });
+  }
+
+  if (modalProfile) {
+    modalProfile.addEventListener('click', (e) => {
+      if (e.target === modalProfile) {
+        modalProfile.style.display = 'none';
+      }
+    });
+  }
+
+  // Chọn avatar trong modal
+  const profileAvatarOpts = document.querySelectorAll('#profile-avatar-selector .avatar-opt');
+  profileAvatarOpts.forEach(opt => {
+    opt.addEventListener('click', () => {
+      profileAvatarOpts.forEach(o => o.classList.remove('selected'));
+      opt.classList.add('selected');
+      profileSelectedAvatar = opt.getAttribute('data-avatar');
+    });
+  });
+
+  // Lưu đổi tên hồ sơ
+  async function saveProfile() {
+    const newName = inputNewDisplayname.value.trim();
+    if (!newName) {
+      alert('Vui lòng nhập tên hiển thị!');
+      inputNewDisplayname.focus();
+      return;
+    }
+
+    try {
+      btnSaveProfile.disabled = true;
+      btnSaveProfile.textContent = 'Đang lưu... ⏳';
+
+      const res = await fetch('/api/user/profile', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${authToken}`
+        },
+        body: JSON.stringify({
+          displayName: newName,
+          avatar: profileSelectedAvatar
+        })
+      });
+
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        throw new Error(data.message || 'Lỗi khi cập nhật tên');
+      }
+
+      currentUser.displayName = data.user.displayName;
+      currentUser.avatar = data.user.avatar;
+      if (myAvatar) {
+        myAvatar.textContent = currentUser.avatar;
+        myAvatar.title = `${currentUser.displayName} (@${currentUser.username}) - Bấm để đổi tên`;
+      }
+
+      loadDirectoryUsers();
+
+      if (modalProfile) modalProfile.style.display = 'none';
+    } catch (err) {
+      alert('Không thể cập nhật tên: ' + err.message);
+    } finally {
+      btnSaveProfile.disabled = false;
+      btnSaveProfile.textContent = 'Lưu Tên Mới 💾';
+    }
+  }
+
+  if (btnSaveProfile) {
+    btnSaveProfile.addEventListener('click', saveProfile);
+  }
+
+  if (inputNewDisplayname) {
+    inputNewDisplayname.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        saveProfile();
+      }
+    });
   }
 
   // ==================== SHARED MEDIA GALLERY LOGIC ====================

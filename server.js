@@ -158,6 +158,36 @@ app.get('/api/auth/me', authMiddleware, (req, res) => {
   res.json({ success: true, user: safeUser });
 });
 
+// Update profile (Đổi tên hiển thị / Avatar bất kỳ lúc nào)
+app.post('/api/user/profile', authMiddleware, (req, res) => {
+  const { displayName, avatar } = req.body;
+  if (!displayName || displayName.trim().length === 0) {
+    return res.status(400).json({ success: false, message: 'Tên hiển thị không được để trống' });
+  }
+
+  const updatedUser = db.updateUserProfile(req.user.id, { displayName, avatar });
+  if (!updatedUser) {
+    return res.status(500).json({ success: false, message: 'Lỗi cập nhật hồ sơ' });
+  }
+
+  // Update in-memory onlineUsers cache
+  if (onlineUsers.has(req.user.id)) {
+    const entry = onlineUsers.get(req.user.id);
+    entry.displayName = updatedUser.displayName;
+    if (avatar) entry.avatar = updatedUser.avatar;
+  }
+
+  // Broadcast cập nhật tới mọi người đang online
+  io.emit('user:profile_updated', {
+    userId: updatedUser.id,
+    displayName: updatedUser.displayName,
+    avatar: updatedUser.avatar
+  });
+
+  const { password: _, ...safeUser } = updatedUser;
+  res.json({ success: true, message: 'Đã đổi tên thành công!', user: safeUser });
+});
+
 // Logout
 app.post('/api/auth/logout', (req, res) => {
   res.clearCookie('aechat_token');

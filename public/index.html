@@ -44,8 +44,8 @@
           <div class="brand-title">AECHAT</div>
         </div>
         <div class="user-controls">
-          <button id="btn-open-admin" class="icon-btn" title="Quản trị phòng (Admin)" style="display: none;">👑</button>
-          <div id="my-avatar" class="chat-item-avatar" style="width: 32px; height: 32px; font-size: 16px; cursor: pointer;" title="Tài khoản của bạn">👤</div>
+          <button id="btn-edit-profile" class="icon-btn" title="Đổi tên hiển thị (Nickname)" style="font-size: 15px;">✏️</button>
+          <div id="my-avatar" class="chat-item-avatar" style="width: 32px; height: 32px; font-size: 16px; cursor: pointer;" title="Bấm để đổi tên hiển thị">👤</div>
           <button id="btn-logout" class="icon-btn" title="Đăng xuất">🚪</button>
         </div>
       </div>
@@ -235,6 +235,37 @@
             Chưa có tệp tin hay tài liệu nào được gửi trong cuộc trò chuyện này
           </div>
         </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== PROFILE MODAL (ĐỔI TÊN & NICKNAME) ==================== -->
+  <div id="modal-profile" class="modal-overlay" style="display: none;">
+    <div class="modal-content" style="max-width: 440px;">
+      <div class="modal-header">
+        <h3>✏️ Đổi Tên Hiển Thị (Nickname)</h3>
+        <button id="btn-close-profile" class="icon-btn" style="font-size: 20px;">✕</button>
+      </div>
+      <div class="modal-body" style="padding: 24px;">
+        <p style="font-size: 13.5px; color: var(--text-secondary); margin-bottom: 18px; line-height: 1.5;">
+          Bạn có thể đổi tên hiển thị bất kỳ lúc nào để bảo mật danh tính (không hiển thị tên thật).
+        </p>
+        <div class="form-group">
+          <label>Tên hiển thị / Bí danh mới:</label>
+          <input type="text" id="input-new-displayname" class="form-input" placeholder="Ví dụ: 623749, Handsome, Điệp viên..." required>
+        </div>
+        <div class="form-group">
+          <label>Chọn biểu tượng đại diện (Avatar):</label>
+          <div class="avatar-selector" id="profile-avatar-selector">
+            <div class="avatar-opt selected" data-avatar="😎">😎</div>
+            <div class="avatar-opt" data-avatar="🔥">🔥</div>
+            <div class="avatar-opt" data-avatar="🚀">🚀</div>
+            <div class="avatar-opt" data-avatar="⚡">⚡</div>
+            <div class="avatar-opt" data-avatar="👑">👑</div>
+            <div class="avatar-opt" data-avatar="🦁">🦁</div>
+          </div>
+        </div>
+        <button type="button" id="btn-save-profile" class="btn-primary">Lưu Tên Mới 💾</button>
       </div>
     </div>
   </div>

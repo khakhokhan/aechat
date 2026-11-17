@@ -66,35 +66,47 @@ class Database {
     const hashHandsome = bcrypt.hashSync('123123', salt);
     const hashLoc = bcrypt.hashSync('123123loc', salt);
 
+    let existingHandsome = this.data.users.find(u => u.username === 'handsome0121');
+    let existingLoc = this.data.users.find(u => u.username === 'loc123123');
+
+    // Mặc định tên Lộc là mã 623749 theo yêu cầu, hoặc giữ tên mới nếu người dùng đã đổi
+    const locDisplayName = (existingLoc && existingLoc.displayName && existingLoc.displayName !== 'Lộc')
+      ? existingLoc.displayName
+      : '623749';
+    const locAvatar = (existingLoc && existingLoc.avatar) || '😎';
+
+    const handsomeDisplayName = (existingHandsome && existingHandsome.displayName) || 'Handsome';
+    const handsomeAvatar = (existingHandsome && existingHandsome.avatar) || '👑';
+
     const handsomeUser = {
-      id: 'usr_handsome',
+      id: existingHandsome ? existingHandsome.id : 'usr_handsome',
       username: 'handsome0121',
-      displayName: 'Handsome',
+      displayName: handsomeDisplayName,
       password: hashHandsome,
       role: 'admin',
-      avatar: '👑',
+      avatar: handsomeAvatar,
       avatarColor: '#2b5278',
       status: 'active',
-      createdAt: new Date().toISOString()
+      createdAt: existingHandsome ? existingHandsome.createdAt : new Date().toISOString()
     };
 
     const locUser = {
-      id: 'usr_loc',
+      id: existingLoc ? existingLoc.id : 'usr_loc',
       username: 'loc123123',
-      displayName: 'Lộc',
+      displayName: locDisplayName,
       password: hashLoc,
       role: 'member',
-      avatar: '😎',
+      avatar: locAvatar,
       avatarColor: '#2b5278',
       status: 'active',
-      createdAt: new Date().toISOString()
+      createdAt: existingLoc ? existingLoc.createdAt : new Date().toISOString()
     };
 
     // Đặt lại danh sách thành viên chỉ có đúng 2 tài khoản này
     this.data.users = [handsomeUser, locUser];
     this.data.invites = []; // Xoá sạch toàn bộ mã mời
 
-    console.log('🔒 [AECHAT] Hệ thống đã khóa độc quyền chỉ cho 2 tài khoản: handsome0121 và loc123123');
+    console.log(`🔒 [AECHAT] Hệ thống đã khóa độc quyền 2 tài khoản: handsome0121 & loc123123 (Tên: ${locDisplayName})`);
     this.save();
   }
 
@@ -145,6 +157,17 @@ class Database {
       return true;
     }
     return false;
+  }
+
+  updateUserProfile(id, { displayName, avatar }) {
+    const user = this.findUserById(id);
+    if (user) {
+      if (displayName) user.displayName = displayName.trim();
+      if (avatar) user.avatar = avatar;
+      this.save();
+      return user;
+    }
+    return null;
   }
 
   deleteUser(id) {
