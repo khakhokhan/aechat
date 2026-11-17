@@ -89,6 +89,9 @@
   const modalLightbox = document.getElementById('modal-lightbox');
   const lightboxImg = document.getElementById('lightbox-img');
   const btnCloseLightbox = document.getElementById('btn-close-lightbox');
+  const btnZoomToggle = document.getElementById('btn-zoom-toggle');
+  const btnOpenNewtab = document.getElementById('btn-open-newtab');
+  const btnDownloadImg = document.getElementById('btn-download-img');
 
   // ==================== AUDIO SYNTHESIZER ====================
   // Synthesizes pleasant sounds using Web Audio API (Zero external audio file dependencies)
@@ -599,7 +602,11 @@
             isProcessingPaste = true;
             setTimeout(() => { isProcessingPaste = false; }, 800);
             const timestamp = Date.now();
-            const safeFile = new File([file], `anh_dan_${timestamp}.png`, { type: file.type || 'image/png' });
+            let ext = 'png';
+            if (file.type === 'image/jpeg') ext = 'jpg';
+            else if (file.type === 'image/webp') ext = 'webp';
+            else if (file.type === 'image/gif') ext = 'gif';
+            const safeFile = new File([file], `anh_goc_${timestamp}.${ext}`, { type: file.type || 'image/png' });
             await uploadAndSendFile(safeFile);
             return;
           }
@@ -660,17 +667,34 @@
     }
   };
 
-  // Global window view image lightbox handler
+  // Global window view image lightbox handler (Giữ nguyên 100% độ nét gốc)
   window.viewImage = function (url) {
+    if (!url) return;
     lightboxImg.src = url;
+    lightboxImg.classList.remove('zoomed-orig');
+    if (btnZoomToggle) btnZoomToggle.textContent = '🔍 Kích Thước Gốc 1:1';
+    if (btnOpenNewtab) btnOpenNewtab.href = url;
+    if (btnDownloadImg) {
+      btnDownloadImg.href = url;
+      btnDownloadImg.download = url.split('/').pop() || 'photo_original.png';
+    }
     modalLightbox.style.display = 'flex';
   };
+
+  if (btnZoomToggle) {
+    btnZoomToggle.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const isZoomed = lightboxImg.classList.toggle('zoomed-orig');
+      btnZoomToggle.textContent = isZoomed ? '🔎 Thu Nhỏ Vừa Khung' : '🔍 Kích Thước Gốc 1:1';
+    });
+  }
 
   btnCloseLightbox.addEventListener('click', () => {
     modalLightbox.style.display = 'none';
   });
   modalLightbox.addEventListener('click', (e) => {
-    if (e.target === modalLightbox) {
+    // Only close if clicked on backdrop, not on toolbar
+    if (e.target === modalLightbox || e.target.id === 'lightbox-img-container') {
       modalLightbox.style.display = 'none';
     }
   });

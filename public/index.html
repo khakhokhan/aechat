@@ -300,10 +300,19 @@
     </div>
   </div>
 
-  <!-- ==================== LIGHTBOX MODAL ==================== -->
+  <!-- ==================== LIGHTBOX MODAL (XEM ẢNH NÉT GỐC 100%) ==================== -->
   <div id="modal-lightbox" class="lightbox-modal" style="display: none;">
     <button id="btn-close-lightbox" class="lightbox-close">✕</button>
-    <img id="lightbox-img" class="lightbox-image" src="" alt="Hình ảnh phóng to">
+    <div class="lightbox-content-wrapper">
+      <div id="lightbox-img-container" style="overflow: auto; max-width: 95vw; max-height: 82vh; text-align: center;">
+        <img id="lightbox-img" class="lightbox-image" src="" alt="Hình ảnh phóng to">
+      </div>
+      <div class="lightbox-toolbar">
+        <button type="button" id="btn-zoom-toggle" class="btn-lightbox-action" title="Phóng to 100% kích thước gốc">🔍 Kích Thước Gốc 1:1</button>
+        <a id="btn-open-newtab" href="" target="_blank" class="btn-lightbox-action" title="Mở ảnh gốc trong tab mới">🔗 Mở Tab Mới (100% Nét Gốc)</a>
+        <a id="btn-download-img" href="" download class="btn-lightbox-action" title="Tải ảnh gốc về máy">⬇️ Tải Về Máy</a>
+      </div>
+    </div>
   </div>
 
   <!-- Scripts -->
