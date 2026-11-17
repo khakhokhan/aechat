@@ -389,6 +389,9 @@ io.on('connection', (socket) => {
     }
   });
 
+  // Anti-duplicate cache for rapid double-sends (IME / rapid click)
+  const lastMsgCache = new Map();
+
   // Handle sending new message
   socket.on('chat:send', (msgData, callback) => {
     const { roomId, directTo, content, attachment } = msgData;
@@ -397,6 +400,15 @@ io.on('connection', (socket) => {
       if (callback) callback({ success: false, error: 'Tin nhắn rỗng' });
       return;
     }
+
+    // Chặn gửi lặp tin nhắn giống hệt nhau trong vòng 800ms từ cùng 1 người
+    const now = Date.now();
+    const prev = lastMsgCache.get(user.id);
+    if (prev && prev.content === content && !attachment && (now - prev.time < 800)) {
+      if (callback) callback({ success: true });
+      return;
+    }
+    lastMsgCache.set(user.id, { content, time: now });
 
     const savedMessage = db.createMessage({
       roomId: directTo ? null : (roomId || 'general'),

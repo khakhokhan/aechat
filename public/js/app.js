@@ -487,10 +487,19 @@
     });
   }
 
+  let isSendingMessage = false;
+  let isIMEComposing = false;
+
   // Send Message Event
   function handleSendMessage() {
+    if (isSendingMessage) return; // Chống bấm liên tiếp hoặc lặp lệnh gửi
+
     const text = chatTextInput.value.trim();
     if (!text) return;
+
+    isSendingMessage = true;
+    chatTextInput.value = '';
+    chatTextInput.style.height = 'auto';
 
     const payload = {
       content: text,
@@ -504,8 +513,9 @@
       }
     });
 
-    chatTextInput.value = '';
-    chatTextInput.style.height = 'auto';
+    setTimeout(() => {
+      isSendingMessage = false;
+    }, 400);
 
     // Stop typing
     emitTyping(false);
@@ -513,9 +523,18 @@
 
   btnSendMessage.addEventListener('click', handleSendMessage);
 
+  // Theo dõi trạng thái gõ tiếng Việt có dấu (Unikey / EVKey / Telex macOS)
+  chatTextInput.addEventListener('compositionstart', () => {
+    isIMEComposing = true;
+  });
+
+  chatTextInput.addEventListener('compositionend', () => {
+    isIMEComposing = false;
+  });
+
   chatTextInput.addEventListener('keydown', (e) => {
-    // Ngăn chặn gõ tiếng Việt bị nhảy từ hoặc lặp chữ (Bộ gõ Telex/VNI)
-    if (e.isComposing || e.keyCode === 229) {
+    // Nếu đang trong quá trình gõ ghép chữ tiếng Việt -> Tuyệt đối không gửi
+    if (isIMEComposing || e.isComposing || e.keyCode === 229) {
       return;
     }
     if (e.key === 'Enter' && !e.shiftKey) {
