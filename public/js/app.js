@@ -237,10 +237,8 @@
     myAvatar.style.backgroundColor = currentUser.avatarColor || '#2b5278';
     myAvatar.title = `${currentUser.displayName} (@${currentUser.username})`;
 
-    if (currentUser.role === 'admin') {
-      btnOpenAdmin.style.display = 'flex';
-    } else {
-      btnOpenAdmin.style.display = 'none';
+    if (btnOpenAdmin) {
+      btnOpenAdmin.style.display = currentUser.role === 'admin' ? 'flex' : 'none';
     }
 
     // Connect Socket.io
@@ -761,14 +759,18 @@
   }
 
   // ==================== ADMIN PANEL LOGIC ====================
-  btnOpenAdmin.addEventListener('click', () => {
-    loadAdminData();
-    modalAdmin.style.display = 'flex';
-  });
+  if (btnOpenAdmin) {
+    btnOpenAdmin.addEventListener('click', () => {
+      loadAdminData();
+      if (modalAdmin) modalAdmin.style.display = 'flex';
+    });
+  }
 
-  btnCloseAdmin.addEventListener('click', () => {
-    modalAdmin.style.display = 'none';
-  });
+  if (btnCloseAdmin) {
+    btnCloseAdmin.addEventListener('click', () => {
+      if (modalAdmin) modalAdmin.style.display = 'none';
+    });
+  }
 
   modalTabs.forEach(tab => {
     tab.addEventListener('click', () => {
@@ -814,33 +816,35 @@
     } catch (e) {}
   }
 
-  btnCreateInvite.addEventListener('click', async () => {
-    const key = adminInviteKey.value.trim();
-    const maxUses = adminInviteMax.value || 1;
-    const label = adminInviteLabel.value.trim();
+  if (btnCreateInvite) {
+    btnCreateInvite.addEventListener('click', async () => {
+      const key = adminInviteKey.value.trim();
+      const maxUses = adminInviteMax.value || 1;
+      const label = adminInviteLabel.value.trim();
 
-    try {
-      const res = await fetch('/api/admin/invites', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${authToken}`
-        },
-        body: JSON.stringify({ key, maxUses, label })
-      });
-      const data = await res.json();
-      if (data.success) {
-        adminInviteKey.value = '';
-        adminInviteLabel.value = '';
-        loadAdminInvites();
-        loadAdminStats();
-      } else {
-        alert(data.message || 'Lỗi tạo mã mời');
+      try {
+        const res = await fetch('/api/admin/invites', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${authToken}`
+          },
+          body: JSON.stringify({ key, maxUses, label })
+        });
+        const data = await res.json();
+        if (data.success) {
+          adminInviteKey.value = '';
+          adminInviteLabel.value = '';
+          loadAdminInvites();
+          loadAdminStats();
+        } else {
+          alert(data.message || 'Lỗi tạo mã mời');
+        }
+      } catch (e) {
+        alert('Lỗi kết nối máy chủ');
       }
-    } catch (e) {
-      alert('Lỗi kết nối máy chủ');
-    }
-  });
+    });
+  }
 
   window.copyInviteLink = function (url) {
     navigator.clipboard.writeText(url).then(() => {
