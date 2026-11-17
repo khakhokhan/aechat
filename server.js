@@ -401,14 +401,15 @@ io.on('connection', (socket) => {
       return;
     }
 
-    // Chặn gửi lặp tin nhắn giống hệt nhau trong vòng 800ms từ cùng 1 người
+    // Chặn gửi lặp tin nhắn hoặc file/ảnh giống hệt nhau trong vòng 800ms từ cùng 1 người
     const now = Date.now();
     const prev = lastMsgCache.get(user.id);
-    if (prev && prev.content === content && !attachment && (now - prev.time < 800)) {
+    const attachUrl = attachment ? attachment.url : '';
+    if (prev && prev.content === content && prev.attachUrl === attachUrl && (now - prev.time < 800)) {
       if (callback) callback({ success: true });
       return;
     }
-    lastMsgCache.set(user.id, { content, time: now });
+    lastMsgCache.set(user.id, { content, attachUrl, time: now });
 
     const savedMessage = db.createMessage({
       roomId: directTo ? null : (roomId || 'general'),

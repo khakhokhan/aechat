@@ -545,8 +545,16 @@
     }
   });
 
+  // Auto-resize textarea when typing multi-line
+  chatTextInput.addEventListener('input', () => {
+    chatTextInput.style.height = 'auto';
+    chatTextInput.style.height = Math.min(chatTextInput.scrollHeight, 120) + 'px';
+  });
+
   // Hỗ trợ Dán ảnh trực tiếp từ Clipboard (Ctrl+V / Cmd+V hoặc chụp màn hình dán vào)
+  let isProcessingPaste = false;
   async function handlePaste(e) {
+    if (isProcessingPaste) return;
     const clipboardData = e.clipboardData || window.clipboardData;
     if (!clipboardData) return;
 
@@ -556,6 +564,8 @@
         const file = clipboardData.files[i];
         if (file.type && file.type.startsWith('image/')) {
           e.preventDefault();
+          isProcessingPaste = true;
+          setTimeout(() => { isProcessingPaste = false; }, 800);
           await uploadAndSendFile(file);
           return;
         }
@@ -571,6 +581,8 @@
           e.preventDefault();
           const file = item.getAsFile();
           if (file) {
+            isProcessingPaste = true;
+            setTimeout(() => { isProcessingPaste = false; }, 800);
             const timestamp = Date.now();
             const safeFile = new File([file], `anh_dan_${timestamp}.png`, { type: file.type || 'image/png' });
             await uploadAndSendFile(safeFile);
@@ -581,8 +593,22 @@
     }
   }
 
+  // Chỉ gắn 1 listener duy nhất trên window để chống sự kiện nổi bọt (bubbling) gây trùng 2 lần
   window.addEventListener('paste', handlePaste);
-  chatTextInput.addEventListener('paste', handlePaste);
+
+  // Tìm kiếm danh sách cuộc trò chuyện và danh bạ tức thì
+  if (inputSearchChats) {
+    inputSearchChats.addEventListener('input', (e) => {
+      const q = (e.target.value || '').toLowerCase().trim();
+      if (chatItemGeneral) {
+        chatItemGeneral.style.display = 'hội anh em 🚀'.includes(q) ? 'flex' : 'none';
+      }
+      document.querySelectorAll('#direct-users-list .chat-item').forEach(item => {
+        const name = (item.querySelector('.chat-item-name')?.textContent || '').toLowerCase();
+        item.style.display = name.includes(q) ? 'flex' : 'none';
+      });
+    });
+  }
 
   // Hỗ trợ Kéo & Thả (Drag & Drop) ảnh/file trực tiếp vào cửa sổ chat
   window.addEventListener('dragover', (e) => e.preventDefault());
@@ -627,6 +653,11 @@
 
   btnCloseLightbox.addEventListener('click', () => {
     modalLightbox.style.display = 'none';
+  });
+  modalLightbox.addEventListener('click', (e) => {
+    if (e.target === modalLightbox) {
+      modalLightbox.style.display = 'none';
+    }
   });
 
   // ==================== FILE & IMAGE UPLOAD ====================
