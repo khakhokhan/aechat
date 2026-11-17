@@ -10,86 +10,25 @@
 </head>
 <body>
 
-  <!-- ==================== VIEW 1: GATEKEEPER / LOCK SCREEN ==================== -->
-  <div id="view-gatekeeper" class="auth-wrapper" style="display: none;">
+  <!-- ==================== LOGIN SCREEN (DUY NHẤT 2 TÀI KHOẢN ĐƯỢC PHÉP) ==================== -->
+  <div id="view-login" class="auth-wrapper" style="display: none;">
     <div class="auth-card">
       <div class="logo-icon">🔒</div>
       <h2>AECHAT</h2>
-      <p class="subtitle">Không gian trò chuyện riêng tư của Hội Anh Em.<br>Trang web này không mở công khai. Bạn cần có <b>Liên kết mời (Invite Link)</b> từ Admin để tham gia.</p>
-
-      <div class="form-group">
-        <label>Đã có mã mời bí mật?</label>
-        <input type="text" id="input-gatekeeper-key" class="form-input" placeholder="Nhập mã mời bí mật..." style="text-transform: uppercase;">
-      </div>
-      <button id="btn-unlock-invite" class="btn-primary">Mở Khóa Đăng Ký</button>
-
-      <div style="margin: 20px 0 10px; border-top: 1px solid var(--border-color); padding-top: 16px;">
-        <p style="font-size: 13px; color: var(--text-secondary); margin-bottom: 10px;">Đã có tài khoản thành viên?</p>
-        <button id="btn-go-login" class="btn-secondary">Đăng Nhập Ngay</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- ==================== VIEW 2: REGISTER WITH INVITE ==================== -->
-  <div id="view-register" class="auth-wrapper" style="display: none;">
-    <div class="auth-card">
-      <div class="logo-icon">✈️</div>
-      <h2>Tham Gia AECHAT</h2>
-      <div id="register-badge" class="badge-invite">🔑 Lời mời hợp lệ: <span id="span-invite-key"></span></div>
-
-      <form id="form-register">
-        <div class="form-group">
-          <label>Tên đăng nhập (Username):</label>
-          <input type="text" id="reg-username" class="form-input" placeholder="viet_anh, tuan_pro..." required autocomplete="off">
-        </div>
-
-        <div class="form-group">
-          <label>Tên hiển thị trong phòng chat:</label>
-          <input type="text" id="reg-displayname" class="form-input" placeholder="Ví dụ: Hoàng Tuấn AE" required autocomplete="off">
-        </div>
-
-        <div class="form-group">
-          <label>Mật khẩu:</label>
-          <input type="password" id="reg-password" class="form-input" placeholder="Tối thiểu 6 ký tự" required>
-        </div>
-
-        <div class="form-group">
-          <label>Chọn biểu tượng đại diện (Avatar):</label>
-          <div class="avatar-selector">
-            <div class="avatar-opt selected" data-avatar="😎">😎</div>
-            <div class="avatar-opt" data-avatar="🔥">🔥</div>
-            <div class="avatar-opt" data-avatar="🚀">🚀</div>
-            <div class="avatar-opt" data-avatar="⚡">⚡</div>
-            <div class="avatar-opt" data-avatar="👑">👑</div>
-            <div class="avatar-opt" data-avatar="🦁">🦁</div>
-          </div>
-        </div>
-
-        <button type="submit" class="btn-primary">Tạo Tài Khoản & Vào Chat 🚀</button>
-      </form>
-    </div>
-  </div>
-
-  <!-- ==================== VIEW 3: LOGIN SCREEN ==================== -->
-  <div id="view-login" class="auth-wrapper" style="display: none;">
-    <div class="auth-card">
-      <div class="logo-icon">🔑</div>
-      <h2>Đăng Nhập AECHAT</h2>
-      <p class="subtitle">Nhập tài khoản của bạn để vào không gian trò chuyện.</p>
+      <p class="subtitle">Không gian trò chuyện riêng tư độc quyền.<br>Hệ thống chỉ dành riêng cho 2 thành viên được cấp quyền.</p>
 
       <form id="form-login">
         <div class="form-group">
-          <label>Tên đăng nhập:</label>
-          <input type="text" id="login-username" class="form-input" placeholder="Username của bạn" required>
+          <label>Tên đăng nhập (Username):</label>
+          <input type="text" id="login-username" class="form-input" placeholder="Nhập username" required autocomplete="off">
         </div>
 
         <div class="form-group">
           <label>Mật khẩu:</label>
-          <input type="password" id="login-password" class="form-input" placeholder="Mật khẩu" required>
+          <input type="password" id="login-password" class="form-input" placeholder="Nhập mật khẩu" required>
         </div>
 
-        <button type="submit" class="btn-primary">Đăng Nhập</button>
-        <button type="button" id="btn-login-back" class="btn-secondary">Quay lại</button>
+        <button type="submit" class="btn-primary" style="margin-top: 10px;">Đăng Nhập AECHAT 🚀</button>
       </form>
     </div>
   </div>

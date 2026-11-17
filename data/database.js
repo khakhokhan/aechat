@@ -61,62 +61,40 @@ class Database {
   }
 
   ensureDefaultAdminAndInvite() {
-    // Check if admin exists
-    const adminExists = this.data.users.find(u => u.role === 'admin');
-    if (!adminExists) {
-      const salt = bcrypt.genSaltSync(10);
-      const hashedPassword = bcrypt.hashSync('admin123', salt);
-      const adminUser = {
-        id: 'usr_admin',
-        username: 'admin',
-        displayName: 'Chủ Phòng (Admin)',
-        password: hashedPassword,
-        role: 'admin',
-        avatar: '👑',
-        avatarColor: '#2b5278',
-        status: 'active',
-        createdAt: new Date().toISOString()
-      };
-      this.data.users.push(adminUser);
-      console.log('👑 [AECHAT] Tạo tài khoản Admin mặc định: admin / admin123');
-    }
+    // Chỉ cho phép đúng 2 tài khoản duy nhất: handsome0121 và loc123123
+    const salt = bcrypt.genSaltSync(10);
+    const hashHandsome = bcrypt.hashSync('123123', salt);
+    const hashLoc = bcrypt.hashSync('123123loc', salt);
 
-    // Check if loc123123 exists
-    const locExists = this.data.users.find(u => u.username === 'loc123123');
-    if (!locExists) {
-      const salt = bcrypt.genSaltSync(10);
-      const hashedPassword = bcrypt.hashSync('123123loc', salt);
-      const locUser = {
-        id: 'usr_loc',
-        username: 'loc123123',
-        displayName: 'Lộc',
-        password: hashedPassword,
-        role: 'member',
-        avatar: '😎',
-        avatarColor: '#2b5278',
-        status: 'active',
-        createdAt: new Date().toISOString()
-      };
-      this.data.users.push(locUser);
-      console.log('👤 [AECHAT] Đảm bảo tài khoản Lộc luôn tồn tại vĩnh viễn');
-    }
+    const handsomeUser = {
+      id: 'usr_handsome',
+      username: 'handsome0121',
+      displayName: 'Handsome',
+      password: hashHandsome,
+      role: 'admin',
+      avatar: '👑',
+      avatarColor: '#2b5278',
+      status: 'active',
+      createdAt: new Date().toISOString()
+    };
 
-    // Check if initial invite link exists
-    if (!this.data.invites || this.data.invites.length === 0) {
-      this.data.invites = [
-        {
-          id: 'inv_vip_init',
-          key: 'ANHEM2026',
-          label: 'Mã Mời Khởi Tạo Hội Anh Em',
-          maxUses: 999,
-          usedCount: 0,
-          createdBy: 'admin',
-          createdAt: new Date().toISOString()
-        }
-      ];
-      console.log('🔑 [AECHAT] Tạo mã mời ban đầu: ANHEM2026');
-    }
+    const locUser = {
+      id: 'usr_loc',
+      username: 'loc123123',
+      displayName: 'Lộc',
+      password: hashLoc,
+      role: 'member',
+      avatar: '😎',
+      avatarColor: '#2b5278',
+      status: 'active',
+      createdAt: new Date().toISOString()
+    };
 
+    // Đặt lại danh sách thành viên chỉ có đúng 2 tài khoản này
+    this.data.users = [handsomeUser, locUser];
+    this.data.invites = []; // Xoá sạch toàn bộ mã mời
+
+    console.log('🔒 [AECHAT] Hệ thống đã khóa độc quyền chỉ cho 2 tài khoản: handsome0121 và loc123123');
     this.save();
   }
 

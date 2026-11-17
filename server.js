@@ -108,62 +108,11 @@ app.get('/api/invite/check/:key', (req, res) => {
   return res.json({ valid: true, label: invite.label, key: invite.key });
 });
 
-// Register user (Requires valid invite key)
+// Đăng ký đã bị khóa vĩnh viễn (Chỉ 2 tài khoản được cấp quyền hoạt động)
 app.post('/api/auth/register', (req, res) => {
-  const { inviteKey, username, displayName, password, avatar, avatarColor } = req.body;
-
-  if (!inviteKey || !username || !displayName || !password) {
-    return res.status(400).json({ success: false, message: 'Vui lòng điền đầy đủ thông tin' });
-  }
-
-  if (username.length < 3 || username.length > 20) {
-    return res.status(400).json({ success: false, message: 'Tên đăng nhập phải từ 3 đến 20 ký tự' });
-  }
-
-  if (password.length < 6) {
-    return res.status(400).json({ success: false, message: 'Mật khẩu phải từ 6 ký tự trở lên' });
-  }
-
-  // Validate invite
-  const invite = db.findInviteByKey(inviteKey);
-  if (!invite) {
-    return res.status(400).json({ success: false, message: 'Mã mời không hợp lệ' });
-  }
-  if (invite.maxUses > 0 && invite.usedCount >= invite.maxUses) {
-    return res.status(400).json({ success: false, message: 'Mã mời đã hết lượt sử dụng' });
-  }
-
-  // Check username taken
-  if (db.findUserByUsername(username)) {
-    return res.status(400).json({ success: false, message: 'Tên đăng nhập đã được sử dụng' });
-  }
-
-  // Create user
-  const newUser = db.createUser({
-    username,
-    displayName,
-    password,
-    avatar: avatar || '👤',
-    avatarColor: avatarColor || '#2b5278',
-    role: 'member'
-  });
-
-  // Consume invite
-  db.useInvite(inviteKey);
-
-  // Generate Token
-  const token = jwt.sign({ id: newUser.id, username: newUser.username, role: newUser.role }, JWT_SECRET, {
-    expiresIn: '30d'
-  });
-
-  res.cookie('aechat_token', token, { httpOnly: true, maxAge: 30 * 24 * 3600 * 1000 });
-
-  const { password: _, ...safeUser } = newUser;
-  return res.json({
-    success: true,
-    message: 'Chào mừng bạn đến với AECHAT!',
-    token,
-    user: safeUser
+  return res.status(403).json({
+    success: false,
+    message: 'Hệ thống đã khóa tính năng đăng ký. Chỉ 2 tài khoản được chỉ định mới có thể sử dụng.'
   });
 });
 

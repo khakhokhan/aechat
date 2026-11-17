@@ -144,33 +144,18 @@
 
   // ==================== VIEW SWITCHING ====================
   function showView(viewName) {
-    viewGatekeeper.style.display = 'none';
-    viewRegister.style.display = 'none';
-    viewLogin.style.display = 'none';
-    appLayout.style.display = 'none';
+    if (viewLogin) viewLogin.style.display = 'none';
+    if (appLayout) appLayout.style.display = 'none';
 
-    if (viewName === 'gatekeeper') viewGatekeeper.style.display = 'flex';
-    else if (viewName === 'register') viewRegister.style.display = 'flex';
-    else if (viewName === 'login') viewLogin.style.display = 'flex';
-    else if (viewName === 'chat') appLayout.style.display = 'flex';
+    if (viewName === 'chat') {
+      if (appLayout) appLayout.style.display = 'flex';
+    } else {
+      if (viewLogin) viewLogin.style.display = 'flex';
+    }
   }
 
   // ==================== APP INITIALIZATION ====================
   async function initApp() {
-    // Check URL parameters for invite key
-    const urlParams = new URLSearchParams(window.location.search);
-    const keyParam = urlParams.get('key') || urlParams.get('invite');
-
-    if (keyParam) {
-      // Validate invite from URL
-      const isValid = await checkInviteKey(keyParam);
-      if (isValid) {
-        spanInviteKey.textContent = keyParam.toUpperCase();
-        showView('register');
-        return;
-      }
-    }
-
     // Check existing login session
     if (authToken) {
       try {
@@ -188,87 +173,9 @@
       }
     }
 
-    // Default to Gatekeeper lock screen
-    showView('gatekeeper');
+    // Default to Login screen (Chỉ 2 tài khoản được phép)
+    showView('login');
   }
-
-  async function checkInviteKey(key) {
-    try {
-      const res = await fetch(`/api/invite/check/${encodeURIComponent(key.trim())}`);
-      const data = await res.json();
-      return data.valid;
-    } catch (err) {
-      return false;
-    }
-  }
-
-  // ==================== GATEKEEPER & AUTH HANDLERS ====================
-  btnUnlockInvite.addEventListener('click', async () => {
-    const key = inputGatekeeperKey.value.trim();
-    if (!key) {
-      alert('Vui lòng nhập mã mời');
-      return;
-    }
-    const isValid = await checkInviteKey(key);
-    if (isValid) {
-      spanInviteKey.textContent = key.toUpperCase();
-      showView('register');
-    } else {
-      alert('Mã mời không tồn tại hoặc đã hết lượt sử dụng!');
-    }
-  });
-
-  btnGoLogin.addEventListener('click', () => showView('login'));
-  btnLoginBack.addEventListener('click', () => showView('gatekeeper'));
-
-  // Avatar selector logic
-  document.querySelectorAll('.avatar-opt').forEach(opt => {
-    opt.addEventListener('click', () => {
-      document.querySelectorAll('.avatar-opt').forEach(o => o.classList.remove('selected'));
-      opt.classList.add('selected');
-      selectedAvatar = opt.getAttribute('data-avatar');
-    });
-  });
-
-  // Register Form Submit
-  formRegister.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const inviteKey = spanInviteKey.textContent.trim();
-    const username = document.getElementById('reg-username').value.trim();
-    const displayName = document.getElementById('reg-displayname').value.trim();
-    const password = document.getElementById('reg-password').value;
-
-    try {
-      const res = await fetch('/api/auth/register', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          inviteKey,
-          username,
-          displayName,
-          password,
-          avatar: selectedAvatar
-        })
-      });
-
-      const data = await res.json();
-      if (!data.success) {
-        alert(data.message || 'Đăng ký thất bại');
-        return;
-      }
-
-      authToken = data.token;
-      currentUser = data.user;
-      localStorage.setItem('aechat_token', authToken);
-
-      // Clean URL parameters
-      window.history.replaceState({}, document.title, window.location.pathname);
-
-      setupChatSession();
-    } catch (err) {
-      alert('Có lỗi xảy ra khi kết nối máy chủ');
-    }
-  });
 
   // Login Form Submit
   formLogin.addEventListener('submit', async (e) => {
@@ -309,7 +216,7 @@
       authToken = null;
       currentUser = null;
       if (socket) socket.disconnect();
-      showView('gatekeeper');
+      showView('login');
     }
   });
 

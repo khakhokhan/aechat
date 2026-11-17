@@ -1,39 +1,29 @@
 {
   "users": [
     {
-      "id": "usr_admin",
-      "username": "admin",
-      "displayName": "Chủ Phòng (Admin)",
-      "password": "$2b$10$9KxAKGsSegQ6kSlhKmPvV.5VMs.bk1A6x//OompqBhHClGVP0Vejy",
+      "id": "usr_handsome",
+      "username": "handsome0121",
+      "displayName": "Handsome",
+      "password": "$2b$10$j6mOfiF3f1AWnfNthG0dpuKFWmo4Js/dyjnFYw144vHVJm7z52HJW",
       "role": "admin",
       "avatar": "👑",
       "avatarColor": "#2b5278",
       "status": "active",
-      "createdAt": "2026-11-17T04:40:47.136Z"
+      "createdAt": "2026-11-17T06:26:49.347Z"
     },
     {
-      "id": "usr_1794890480538_2zitp",
-      "username": "tuan_ae",
-      "displayName": "Tuấn AE",
-      "password": "$2b$10$.v7Lu/Ra3FPABsMrmFnjrOzU1T0jFsi55ZjnMd0e0fteca/rjPUt2",
+      "id": "usr_loc",
+      "username": "loc123123",
+      "displayName": "Lộc",
+      "password": "$2b$10$j6mOfiF3f1AWnfNthG0dpuRwppw39oSfUOHB0.b/e62e8ttOi2mRi",
       "role": "member",
-      "avatar": "🔥",
+      "avatar": "😎",
       "avatarColor": "#2b5278",
       "status": "active",
-      "createdAt": "2026-11-17T04:41:20.538Z"
+      "createdAt": "2026-11-17T06:26:49.347Z"
     }
   ],
-  "invites": [
-    {
-      "id": "inv_vip_init",
-      "key": "ANHEM2026",
-      "label": "Mã Mời Khởi Tạo Hội Anh Em",
-      "maxUses": 999,
-      "usedCount": 1,
-      "createdBy": "admin",
-      "createdAt": "2026-11-17T04:40:47.140Z"
-    }
-  ],
+  "invites": [],
   "messages": [],
   "rooms": [
     {
