@@ -81,6 +81,26 @@ class Database {
       console.log('👑 [AECHAT] Tạo tài khoản Admin mặc định: admin / admin123');
     }
 
+    // Check if loc123123 exists
+    const locExists = this.data.users.find(u => u.username === 'loc123123');
+    if (!locExists) {
+      const salt = bcrypt.genSaltSync(10);
+      const hashedPassword = bcrypt.hashSync('123123loc', salt);
+      const locUser = {
+        id: 'usr_loc',
+        username: 'loc123123',
+        displayName: 'Lộc',
+        password: hashedPassword,
+        role: 'member',
+        avatar: '😎',
+        avatarColor: '#2b5278',
+        status: 'active',
+        createdAt: new Date().toISOString()
+      };
+      this.data.users.push(locUser);
+      console.log('👤 [AECHAT] Đảm bảo tài khoản Lộc luôn tồn tại vĩnh viễn');
+    }
+
     // Check if initial invite link exists
     if (!this.data.invites || this.data.invites.length === 0) {
       this.data.invites = [
